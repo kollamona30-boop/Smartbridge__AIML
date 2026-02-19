@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Electric Motor Temperature Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #5f2c82, #49a09d);
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            font-size: 40px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 30px;
+        }
+
+        .card {
+            background: white;
+            width: 450px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #7b2ff7, #f107a3);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .values-list {
+            margin-top: 20px;
+        }
+
+        .values-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .values-list li {
+            margin-bottom: 8px;
+        }
+
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Electric Motor Temperature Prediction</h1>
+
+<div class="container">
+
+    <!-- LEFT CARD -->
+    <div class="card">
+        <h2>Input Parameters</h2>
+
+        <form action="/predict" method="post">
+
+            <input type="number" step="any" name="ambient" placeholder="Ambient Temperature" required>
+            <input type="number" step="any" name="coolant" placeholder="Coolant Temperature" required>
+            <input type="number" step="any" name="u_d" placeholder="u_d" required>
+            <input type="number" step="any" name="u_q" placeholder="u_q" required>
+            <input type="number" step="any" name="motor_speed" placeholder="Motor Speed" required>
+            <input type="number" step="any" name="i_d" placeholder="i_d" required>
+            <input type="number" step="any" name="i_q" placeholder="i_q" required>
+
+            <button class="btn">Predict Now</button>
+
+        </form>
+    </div>
+
+    <!-- RIGHT CARD -->
+    <div class="card">
+        <h2>Selected Input Values</h2>
+
+        {% if inputs %}
+        <div class="values-list">
+            <ul>
+                <li>Ambient: {{ inputs[0] }}</li>
+                <li>Coolant: {{ inputs[1] }}</li>
+                <li>u_d: {{ inputs[2] }}</li>
+                <li>u_q: {{ inputs[3] }}</li>
+                <li>Motor Speed: {{ inputs[4] }}</li>
+                <li>i_d: {{ inputs[5] }}</li>
+                <li>i_q: {{ inputs[6] }}</li>
+            </ul>
+        </div>
+
+        <canvas id="myChart"></canvas>
+
+        <script>
+            const ctx = document.getElementById('myChart');
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Ambient','Coolant','u_d','u_q','Motor Speed','i_d','i_q'],
+                    datasets: [{
+                        data: {{ inputs }},
+                        backgroundColor: [
+                            '#ff6384','#36a2eb','#4bc0c0',
+                            '#ff9f40','#9966ff','#c9cbcf','#f67019'
+                        ]
+                    }]
+                }
+            });
+        </script>
+        {% endif %}
+
+        {% if prediction_text %}
+            <h3 style="margin-top:20px;">{{ prediction_text }}</h3>
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
